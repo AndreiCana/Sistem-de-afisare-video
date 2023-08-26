@@ -18,6 +18,7 @@ class VideoDisplayApp:
         self.setup_ui()
 
     def setup_ui(self):
+        # Crearea etichetelor și câmpurilor de introducere pentru configurații
         self.num_monitors_label = ttk.Label(self.root, text="Numar de monitoare:")
         self.num_monitors_label.pack()
 
@@ -35,27 +36,32 @@ class VideoDisplayApp:
         self.video_path_entry.pack()
         self.video_path_entry.insert(0, self.config['video_path'])
 
+        # Buton pentru încărcarea videoului
         self.load_button = ttk.Button(self.root, text="Incarcare Video", command=self.load_video)
         self.load_button.pack()
 
+        # Buton pentru redarea videoului
         self.play_button = ttk.Button(self.root, text="Play Video", command=self.play_video)
         self.play_button.pack()
 
     def load_video(self):
+        # Funcția care se apelează la apăsarea butonului "Incarcare Video"
+        # Obține calea către videoul dorit și inițializează captura videoului
         self.config['video_path'] = self.video_path_entry.get()
         self.cap = cv2.VideoCapture(self.config['video_path'])
         self.config['num_monitors'] = int(self.num_monitors_entry.get())
 
     def play_video(self):
+        # Funcția care se apelează la apăsarea butonului "Play Video"
         if self.cap is None:
             return
-
-        fps = self.cap.get(cv2.CAP_PROP_FPS)  
-        frame_width = int(self.cap.get(3))  
-        frame_height = int(self.cap.get(4))  
+        
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        frame_width = int(self.cap.get(3))
+        frame_height = int(self.cap.get(4))
         frame_size = (frame_width, frame_height)
         
-        # Calculează dimensiunea fiecărui cadru video pentru fiecare monitor
+        # Calculează dimensiunile fiecărui cadru video pentru fiecare monitor
         monitor_cols = int(self.config['num_monitors'] ** 0.5)
         monitor_rows = (self.config['num_monitors'] + monitor_cols - 1) // monitor_cols
         monitor_frame_width = frame_width // monitor_cols
@@ -82,7 +88,7 @@ class VideoDisplayApp:
                 monitor_frame = frame[start_y:end_y, start_x:end_x, :]
                 cv2.imshow(f"Monitor {i}", monitor_frame)
             
-            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'): 
+            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
                 break
         
         self.cap.release()
@@ -92,4 +98,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = VideoDisplayApp(root)
     root.mainloop()
-
